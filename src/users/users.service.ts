@@ -10,6 +10,7 @@ import { UserSignUpDto } from './dto/users-signup.dto';
 import { hash, compare } from 'bcrypt';
 import { UserSignInDto } from './dto/users-signin.dto';
 import { sign } from 'jsonwebtoken';
+import { Roles } from 'src/utility/common/users-role.enum';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -73,5 +74,19 @@ export class UsersService {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('user not found.');
     return user;
+  }
+
+  async makeAdmin(userId: number): Promise<UserEntity> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
+
+    if (!user) {
+      throw new NotFoundException(`Usuario con id ${userId} no encontrado`);
+    }
+
+    if (!user.roles.includes(Roles.ADMIN)) {
+      user.roles.push(Roles.ADMIN); // Agregar el rol ADMIN si no lo tiene
+    }
+
+    return this.usersRepository.save(user); // Guardar el usuario con el nuevo rol
   }
 }

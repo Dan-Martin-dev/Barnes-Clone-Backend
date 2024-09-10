@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserSignUpDto } from './dto/users-signup.dto';
 import { UserEntity } from './entities/user.entity';
@@ -6,6 +6,8 @@ import { UserSignInDto } from './dto/users-signin.dto';
 import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { AuthenticationGuard } from 'src/utility/guards/authentication.guards';
 import { AuthorizationGuard } from 'src/utility/guards/authorization.guards';
+import { AuthorizeRoles } from 'src/utility/decorators/authorize-roles.decorator';
+import { Roles } from 'src/utility/common/users-role.enum';
 
 @Controller('users')
 export class UsersController {
@@ -17,9 +19,10 @@ export class UsersController {
     return { message: 'Test endpoint working!' };
   }
 
-  @AuthorizationGuard(Roles)
+  //@AuthorizeRoles(Roles.ADMIN)
+  @UseGuards(AuthenticationGuard, AuthorizationGuard([Roles.ADMIN]))
   @Get('all')
-  async findAll() {
+  async findAll(): Promise<UserEntity[]> {
     return await this.usersService.findAll();
   }
 
@@ -46,5 +49,10 @@ export class UsersController {
   @Get('me')
   getProfile(@CurrentUser() currentUser: UserEntity) {
     return currentUser;
+  }
+
+  @Patch(':id/make-admin')
+  async makeAdmin(@Param('id') id: number): Promise<UserEntity> {
+    return this.usersService.makeAdmin(id);
   }
 }
