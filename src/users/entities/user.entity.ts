@@ -2,6 +2,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
 import { Roles } from "src/utility/common/users-role.enum";
 import { CategoryEntity } from "src/categories/entities/category.entity";
+import { ProductEntity } from "src/products/entities/product.entity";
 
 // database table structure representation
 @Entity('users')
@@ -29,4 +30,7 @@ export class UserEntity {
 
     @OneToMany(()=>CategoryEntity, (cat)=>cat.addedBy)
     categories:CategoryEntity[]
+
+    @OneToMany(()=>ProductEntity, (prod)=>prod.addedBy)
+    products:ProductEntity[]
 }

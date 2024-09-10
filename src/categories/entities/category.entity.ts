@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "src/users/entities/user.entity";
+import { ProductEntity } from "src/products/entities/product.entity";
 
 // Database table structure representation
 @Entity({name:'categories'})
@@ -22,4 +23,7 @@ export class CategoryEntity {
 
     @ManyToOne(()=>UserEntity, (user)=>user.categories)
     addedBy:UserEntity;
+
+    @OneToMany(()=>ProductEntity, (prod)=>prod.category)
+    products:ProductEntity[];
 }
