@@ -17,7 +17,6 @@ export class Product {}
 export class ProductEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
   @Column()
   title: string;
   @Column()

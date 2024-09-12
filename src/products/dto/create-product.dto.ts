@@ -7,6 +7,7 @@ import {
   Min,
 } from 'class-validator';
 
+// data validation
 export class CreateProductDto {
   @IsNotEmpty({ message: 'title can not be empty' })
   @IsString()
@@ -35,5 +36,5 @@ export class CreateProductDto {
 
   @IsNotEmpty({ message: 'categories can not be empty' })
   @IsNumber({}, { message: 'category id should be a number' })
-  category: number;
+  categoryId: number;
 }

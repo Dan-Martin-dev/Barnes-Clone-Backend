@@ -21,6 +21,7 @@ export class CategoriesService {
     category.addedBy = currentUser;
     return await this.categoryRepository.save(category);
   }
+
   async findOne(id: number): Promise<CategoryEntity> {
     return await this.categoryRepository.findOne({
       where: { id: id },
