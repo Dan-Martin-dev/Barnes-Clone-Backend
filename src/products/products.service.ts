@@ -8,6 +8,9 @@ import { CategoriesService } from 'src/categories/categories.service';
 import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { UserEntity } from 'src/users/entities/user.entity';
 
+// Services are providers created as dependencies. They are responsible for fetching data and saving data to the database.
+// Multiple controllers can inject a single service.
+
 @Injectable()
 export class ProductsService {
   constructor(

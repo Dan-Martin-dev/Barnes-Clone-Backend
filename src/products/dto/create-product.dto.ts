@@ -7,7 +7,7 @@ import {
   Min,
 } from 'class-validator';
 
-// data validation
+// Data Transfer Object (DTO) data validation
 export class CreateProductDto {
   @IsNotEmpty({ message: 'title can not be empty' })
   @IsString()
