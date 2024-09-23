@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -43,6 +44,10 @@ export class OrderEntity {
   @JoinColumn()
   shippingAddress: ShippingEntity;
 
+  // one order can have multiple products
   @OneToMany(() => OrderProductsEntity, (op) => op.order, { cascade: true })
   products: OrderProductsEntity[];
+
+  @ManyToOne(() => UserEntity, (user) => user.orders)
+  user: UserEntity;
 }

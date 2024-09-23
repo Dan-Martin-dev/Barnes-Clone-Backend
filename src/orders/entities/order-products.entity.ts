@@ -29,7 +29,7 @@ export class OrderProductsEntity {
   @ManyToOne(() => OrderEntity, (order) => order.products)
   order: OrderEntity;
 
-  // multiple product orders can have only one 
-  @ManyToOne(() => ProductEntity, (prod) => prod.products, {cascade:true})
+  // multiple product orders can have only one
+  @ManyToOne(() => ProductEntity, (prod) => prod.products, { cascade: true })
   products: ProductEntity[];
 }

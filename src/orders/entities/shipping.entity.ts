@@ -10,6 +10,7 @@ import {
 import { OrderEntity } from './order.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 
+// Database table representation 
 @Entity({ name: 'shipping' })
 export class ShippingEntity {
   @PrimaryGeneratedColumn()

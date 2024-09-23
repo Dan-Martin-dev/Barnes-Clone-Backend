@@ -36,5 +36,9 @@ export class UserEntity {
     products:ProductEntity[]
 
     @OneToMany(()=>OrderEntity, (order)=>order.updatedBy)
-    ordersUpdatedBy:OrderEntity[]
+    ordersUpdatedBy:OrderEntity[];
+
+    @OneToMany(()=>OrderEntity,(order)=>order.user)
+    orders:OrderEntity[];
+    
 }
