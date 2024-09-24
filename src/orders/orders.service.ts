@@ -25,7 +25,8 @@ export class OrdersService {
     orderEntity.shippingAddress = shippingEntity;
     orderEntity.user = currentUser;
     const order = await this.orderRepository.save(orderEntity);
-    let opEntity: {
+
+    const opEntity: {
       orderId: number;
       productId: number;
       product_quantity: number;
@@ -39,19 +40,37 @@ export class OrdersService {
         createOrderDto.orderedProducts[i].product_quantity;
       const product_unit_price =
         createOrderDto.orderedProducts[i].product_unit_price;
+      opEntity.push({
+        orderId,
+        productId,
+        product_quantity,
+        product_unit_price,
+      });
     }
-    const op = await this.opRepository.createQueryBuilder()
-    .insert()
-    .into(OrderProductsEntity)
-    .values(opEntity)
+
+    const op = await this.opRepository
+      .createQueryBuilder()
+      .insert()
+      .into(OrderProductsEntity)
+      .values(opEntity)
+      .execute();
+
+    return await this.findOne(order.id);
   }
 
   findAll() {
     return `This action returns all orders`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(id: number) {
+    return await this.orderRepository.findOne({
+      where: { id },
+      relations: {
+        shippingAddress: true,
+        user: true,
+        products: { products: true },
+      },
+    });
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {

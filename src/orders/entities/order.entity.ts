@@ -5,7 +5,6 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
-  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -25,7 +24,7 @@ export class OrderEntity {
   id: number;
 
   @CreateDateColumn()
-  orderAt: Timestamp;
+  orderAt: Date;
 
   @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PROCESSING })
   status: string;
@@ -35,10 +34,6 @@ export class OrderEntity {
 
   @Column({ nullable: true })
   deliveredAt: Date;
-
-  // multiple orders can be placed by one user
-  @ManyToOne(() => UserEntity, (user) => user.ordersUpdatedBy)
-  updatedBy: UserEntity;
 
   @OneToOne(() => ShippingEntity, (ship) => ship.order, { cascade: true })
   @JoinColumn()
@@ -50,4 +45,7 @@ export class OrderEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.orders)
   user: UserEntity;
+
+  @ManyToOne(() => UserEntity, (user) => user.ordersUpdatedBy)
+  updatedBy: UserEntity;
 }

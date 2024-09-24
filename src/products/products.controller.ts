@@ -32,13 +32,13 @@ export class ProductsController {
   }
 
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  async findAll() {
+    return await this.productsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.productsService.findOne(+id);
   }
 
   @Patch(':id')

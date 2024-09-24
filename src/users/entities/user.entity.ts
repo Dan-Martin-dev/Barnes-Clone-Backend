@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Timestamp, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Roles } from "src/utility/common/users-role.enum";
 import { CategoryEntity } from "src/categories/entities/category.entity";
 import { ProductEntity } from "src/products/entities/product.entity";
@@ -24,10 +24,10 @@ export class UserEntity {
     roles:Roles[]
 
     @CreateDateColumn()
-    createdAt:Timestamp
+    createdAt:Date
     
     @UpdateDateColumn()
-    updatedAt:Timestamp
+    updatedAt:Date
 
     @OneToMany(()=>CategoryEntity, (cat)=>cat.addedBy)
     categories:CategoryEntity[]
