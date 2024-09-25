@@ -20,7 +20,7 @@ export class ShippingEntity {
   phone: string;
 
   @Column({ default: '' })
-  adress: string;
+  address: string;
 
   @Column({ nullable: true })
   city: string;

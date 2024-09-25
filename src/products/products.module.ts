@@ -20,5 +20,6 @@ import { ShippingEntity } from 'src/orders/entities/shipping.entity';
   ],
   controllers: [ProductsController],
   providers: [ProductsService],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

@@ -28,9 +28,9 @@ export class OrdersController {
     return await this.ordersService.create(createOrderDto, currentUser);
   }
 
-  @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  @Get('all')
+  async findAll() {
+    return await this.ordersService.findAll();
   }
 
   @Get(':id')

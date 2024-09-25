@@ -24,7 +24,7 @@ export class OrderProductsEntity {
   product_unit_price: number;
 
   @Column()
-  product_quantiy: number;
+  product_quantity: number;
 
   @ManyToOne(() => OrderEntity, (order) => order.products)
   order: OrderEntity;
