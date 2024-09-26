@@ -1,4 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Injectable,
+  NotFoundException,
+  Param,
+  Put,
+} from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
@@ -9,6 +16,8 @@ import { OrderProductsEntity } from './entities/order-products.entity';
 import { ShippingEntity } from './entities/shipping.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/products.service';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { OrderStatus } from './enums/order-status.enum';
 
 @Injectable()
 export class OrdersService {
@@ -21,7 +30,10 @@ export class OrdersService {
   ) {}
 
   // Recibe datos de la orden y del usuario actual
-  async create(createOrderDto: CreateOrderDto, currentUser: UserEntity) {
+  async create(
+    createOrderDto: CreateOrderDto,
+    currentUser: UserEntity,
+  ): Promise<OrderEntity> {
     // 2) Crea un objeto para la dirección de envío:
     const shippingEntity = new ShippingEntity();
     Object.assign(shippingEntity, createOrderDto.shippingAddress);
@@ -71,60 +83,77 @@ export class OrdersService {
     });
   }
 
-  async findAll() {
+  async findAll(): Promise<OrderEntity[]> {
     return await this.orderRepository.find({
       relations: {
         shippingAddress: true,
         user: true,
-        products: { products: true },
+        products: { product: true },
       },
     });
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(
+    id: number,
+    updateOrderStatusDto: UpdateOrderStatusDto,
+    currentUser: UserEntity,
+  ) {
+    let order = await this.findOne(id);
+    if (!order) throw new NotFoundException('Order not found');
+
+    /* exception 1*/
+    if (
+      order.status === OrderStatus.DELIVERED ||
+      order.status === OrderStatus.CANCELLED
+    ) {
+      throw new BadRequestException(`Order already ${order.status}`);
+    }
+
+    /*  exception 2  */
+    if (
+      order.status === OrderStatus.PROCESSING &&
+      updateOrderStatusDto.status === OrderStatus.SHIPPED
+    ) {
+      throw new BadRequestException(`Delivery before shipped`);
+    }
+
+    /*  return order */
+    if (
+      updateOrderStatusDto.status === OrderStatus.SHIPPED &&
+      order.status === OrderStatus.SHIPPED
+    ) {
+      return order;
+    }
+
+    /* shipped  */
+    if (updateOrderStatusDto.status === OrderStatus.SHIPPED) {
+      order.shippedAt = new Date();
+    }
+
+    /* delivered  */
+    if (updateOrderStatusDto.status === OrderStatus.DELIVERED) {
+      order.deliveredAt = new Date();
+    }
+    order.status = updateOrderStatusDto.status;
+    order.updatedBy = currentUser;
+    order = await this.orderRepository.save(order);
+    if (updateOrderStatusDto.status === OrderStatus.DELIVERED) {
+      await this.stockUpdate(order, OrderStatus.DELIVERED);
+    }
+    return order;
   }
 
   remove(id: number) {
     return `This action removes a #${id} order`;
   }
+
+  async stockUpdate(order: OrderEntity, status: string) {
+    for (const op of order.products) {
+      await this.productService.updateStock(
+        op.product.id,
+        op.product_quantity,
+        status,
+      );
+    }
+  }
 }
-
-/* 
-create:
-1) Recibe datos de la orden y del usuario actual: 
-  La función create toma dos parámetros: 
-    createOrderDto (los detalles de la orden) 
-    y currentUser (el usuario que está haciendo la compra).
-
-2) Crea un objeto para la dirección de envío: 
-  Se crea un nuevo objeto ShippingEntity para guardar la información de la dirección de envío. 
-  Luego, se copian los datos de la dirección (como teléfono, dirección, ciudad, etc.) 
-  de createOrderDto.shippingAddress al objeto shippingEntity.
-
-3) Crea un objeto para la orden: 
-  Se crea un objeto OrderEntity que representará la orden. 
-  Este objeto incluye la dirección de envío (shippingAddress) y la información del usuario que hace la orden (user).
-
-4) Guarda la orden en la base de datos: 
-  La orden se guarda en la base de datos usando orderRepository.save. 
-  Esto almacena la orden y devuelve el objeto guardado, que incluye el id generado para la orden.
-
-5) Procesa los productos pedidos: 
-  Verifica si los productos ordenados (orderedProducts) son un array. 
-  Si es así, los procesa. Si no, crea un array vacío.
-
-6) Crea una lista de productos de la orden: 
-  Usa la función map para recorrer cada producto en orderedProducts. 
-  Para cada producto, crea un objeto con:
-    orderId: El ID de la orden generada anteriormente.
-    productId: El ID del producto que se está ordenando.
-    product_quantity: La cantidad de ese producto que se ordenó.
-    product_unit_price: El precio unitario del producto.
-
-7) Guarda los productos en la base de datos: 
-  Usando opRepository, inserta la lista de productos en la base de datos en la tabla OrderProductsEntity.
-
-8) Devuelve la orden completa: 
-  Finalmente, llama a findOne(order.id) para devolver los detalles completos de la orden que se acaba de crear, incluyendo los productos.
-*/

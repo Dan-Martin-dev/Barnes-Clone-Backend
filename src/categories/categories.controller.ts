@@ -32,7 +32,7 @@ export class CategoriesController {
     return await this.categoriesService.create(createCategoryDto, currentUser);
   }
 
-  @Get()
+  @Get('all')
   async findAll(): Promise<CategoryEntity[]> {
     return await this.categoriesService.findAll();
   }
