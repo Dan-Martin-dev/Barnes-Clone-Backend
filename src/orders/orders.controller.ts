@@ -33,7 +33,7 @@ export class OrdersController {
     return await this.ordersService.create(createOrderDto, currentUser);
   }
 
-  @Get('all')
+  @Get()
   async findAll(): Promise<OrderEntity[]> {
     return await this.ordersService.findAll();
   }
@@ -57,8 +57,12 @@ export class OrdersController {
     );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  @Put('cancel/:id')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard([Roles.ADMIN]))
+  async cancelled(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: UserEntity,
+  ) {
+    return await this.ordersService.cancelled(+id, currentUser);
   }
 }

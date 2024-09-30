@@ -44,4 +44,7 @@ export class ProductEntity {
   // one product can have multiple product orders.
   @OneToMany(() => OrderProductsEntity, (op) => op.product)
   product: OrderProductsEntity[];
+  
+  @OneToMany(() => OrderProductsEntity, (op) => op.product)
+  product: OrderProductsEntity[];
 }

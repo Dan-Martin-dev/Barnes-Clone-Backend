@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -17,11 +18,12 @@ import { Roles } from 'src/utility/common/users-role.enum';
 import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ProductEntity } from './entities/product.entity';
+import dataSource from 'db/data-source';
+import { get } from 'http';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
-
   @UseGuards(AuthenticationGuard, AuthorizationGuard([Roles.ADMIN]))
   @Post()
   async create(
@@ -32,8 +34,8 @@ export class ProductsController {
   }
 
   @Get()
-  async findAll() {
-    return await this.productsService.findAll();
+  async findAll(@Query() query: any): Promise<any> {
+    return await this.productsService.findAll(query);
   }
 
   @Get(':id')

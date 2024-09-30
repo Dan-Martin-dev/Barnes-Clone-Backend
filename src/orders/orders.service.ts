@@ -19,6 +19,7 @@ import { ProductsService } from 'src/products/products.service';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrderStatus } from './enums/order-status.enum';
 
+// business logic
 @Injectable()
 export class OrdersService {
   constructor(
@@ -112,7 +113,7 @@ export class OrdersService {
     /*  exception 2  */
     if (
       order.status === OrderStatus.PROCESSING &&
-      updateOrderStatusDto.status === OrderStatus.SHIPPED
+      updateOrderStatusDto.status != OrderStatus.SHIPPED
     ) {
       throw new BadRequestException(`Delivery before shipped`);
     }
@@ -134,12 +135,15 @@ export class OrdersService {
     if (updateOrderStatusDto.status === OrderStatus.DELIVERED) {
       order.deliveredAt = new Date();
     }
+
     order.status = updateOrderStatusDto.status;
     order.updatedBy = currentUser;
     order = await this.orderRepository.save(order);
+
     if (updateOrderStatusDto.status === OrderStatus.DELIVERED) {
       await this.stockUpdate(order, OrderStatus.DELIVERED);
     }
+
     return order;
   }
 
@@ -155,5 +159,16 @@ export class OrdersService {
         status,
       );
     }
+  }
+
+  async cancelled(id: number, currentUser: UserEntity) {
+    let order = await this.findOne(id);
+    if (!order) throw new NotFoundException('Order not found');
+    if (order.status === OrderStatus.CANCELLED) return order;
+    order.status = OrderStatus.CANCELLED;
+    order.updatedBy = currentUser;
+    order = await this.orderRepository.save(order);
+    await this.stockUpdate(order, OrderStatus.CANCELLED);
+    return order;
   }
 }

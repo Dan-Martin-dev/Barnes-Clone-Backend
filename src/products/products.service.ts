@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Get, Injectable, NotFoundException, Query } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +8,7 @@ import { CategoriesService } from 'src/categories/categories.service';
 import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { OrderStatus } from 'src/orders/enums/order-status.enum';
+import dataSource from 'db/data-source';
 
 // Services are providers created as dependencies. They are responsible for fetching data and saving data to the database.
 // Multiple controllers can inject a single service.
@@ -33,8 +34,28 @@ export class ProductsService {
     return await this.productRepository.save(product);
   }
 
-  async findAll() {
-    return await this.productRepository.find();
+  async findAll(@Query() query: any): Promise<any> {
+    let filteredTotalProducts: number;
+    let limit: number;
+
+    if (!query.limit) {
+      limit = 4;
+    } else {
+      limit = query.limit;
+    }
+    const queryBuilder = dataSource
+      .getRepository(ProductEntity)
+      .createQueryBuilder('products')
+      .leftJoinAndSelect('.product.category', 'category')
+      .leftJoin('product.review', 'review')
+      .addSelect([
+        'COUNT(review.id) AS reviewCount',
+        'AVG(review.ratings)::number(10,2) AS avgRating',
+      ])
+      .groupBy('product.id,category.id');
+
+    const totalProducts = await queryBuilder.getCount();
+    return totalProducts;
   }
 
   async findOne(id: number): Promise<ProductEntity> {

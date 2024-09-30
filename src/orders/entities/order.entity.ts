@@ -18,6 +18,7 @@ import { ShippingEntity } from './shipping.entity';
 import { OrderProductsEntity } from './order-products.entity';
 
 // database table structure representation
+// Representa una orden de compra o pedido.
 @Entity({ name: 'orders' })
 export class OrderEntity {
   @PrimaryGeneratedColumn()

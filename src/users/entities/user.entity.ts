@@ -4,6 +4,7 @@ import { Roles } from "src/utility/common/users-role.enum";
 import { CategoryEntity } from "src/categories/entities/category.entity";
 import { ProductEntity } from "src/products/entities/product.entity";
 import { OrderEntity } from "src/orders/entities/order.entity";
+import { ReviewEntity } from "src/reviews/entities/review.entity";
 
 // database table structure representation
 @Entity('users')
@@ -41,4 +42,6 @@ export class UserEntity {
     @OneToMany(()=>OrderEntity,(order)=>order.user)
     orders:OrderEntity[];
     
+    @OneToMany(()=>ReviewEntity,(review)=>review.user)
+    reviews:ReviewEntity[];
 }
