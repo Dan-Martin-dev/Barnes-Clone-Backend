@@ -1,5 +1,6 @@
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { OrderProductsEntity } from 'src/orders/entities/order-products.entity';
+import { ReviewEntity } from 'src/reviews/entities/review.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -44,7 +45,7 @@ export class ProductEntity {
   // one product can have multiple product orders.
   @OneToMany(() => OrderProductsEntity, (op) => op.product)
   product: OrderProductsEntity[];
-  
-  @OneToMany(() => OrderProductsEntity, (op) => op.product)
-  product: OrderProductsEntity[];
+
+  @OneToMany(() => ReviewEntity, (reviews) => reviews.product)
+  reviews: ReviewEntity[];
 }

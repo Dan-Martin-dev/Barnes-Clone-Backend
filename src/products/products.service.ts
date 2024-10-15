@@ -57,7 +57,7 @@ export class ProductsService {
     const totalProducts = await queryBuilder.getCount();
     return totalProducts;
   }
-
+ 
   async findOne(id: number): Promise<ProductEntity> {
     const product = await this.productRepository.findOne({
       where: { id },

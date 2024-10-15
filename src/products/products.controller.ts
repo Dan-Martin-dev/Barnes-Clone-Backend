@@ -33,10 +33,12 @@ export class ProductsController {
     return await this.productsService.create(createProductDto, currentUser);
   }
 
+/* 
   @Get()
   async findAll(@Query() query: any): Promise<any> {
     return await this.productsService.findAll(query);
   }
+ */
 
   @Get(':id')
   async findOne(@Param('id') id: string) {

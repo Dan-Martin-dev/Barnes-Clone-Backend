@@ -26,7 +26,7 @@ export class UsersService {
     const userExists = await this.findUserByEmail(userSignUpDto.email);
     if (userExists) throw new BadRequestException('Email is not available');
 
-    userSignUpDto.password = await hash(userSignUpDto.password, 10);
+    userSignUpDto.password = await hash(userSignUpDto.password, 12);
     let user = this.usersRepository.create(userSignUpDto);
     user = await this.usersRepository.save(user);
 

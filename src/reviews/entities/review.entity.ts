@@ -14,9 +14,6 @@ export class ReviewEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int', width: 1, default: 5 })
-  rating: number;
-
   @Column({ type: 'text' })
   comment: string;
 
