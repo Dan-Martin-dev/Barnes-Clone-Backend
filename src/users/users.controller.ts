@@ -6,6 +6,8 @@ import {
   Param,
   UseGuards,
   Patch,
+  Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserSignUpDto } from './dto/users-signup.dto';
@@ -51,6 +53,15 @@ export class UsersController {
     const user = await this.usersService.signin(userSignInDto);
     const accessToken = await this.usersService.accessToken(user);
     return { accessToken, user };
+  }
+
+  @Post('logout')
+  async logout(@Req() request): Promise<{ message: string }> {
+    const token = request.headers.authorization?.split(' ')[1]; // Extract the token from the Authorization header
+    if (!token) {
+      throw new BadRequestException('No token provided.');
+    }
+    return this.usersService.logout(token);
   }
 
   @UseGuards(AuthenticationGuard)

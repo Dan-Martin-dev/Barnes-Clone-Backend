@@ -13,6 +13,7 @@ import { sign } from 'jsonwebtoken';
 import { Roles } from 'src/utility/common/users-role.enum';
 import * as dotenv from 'dotenv';
 dotenv.config();
+import { TokenBlacklistService } from './token-blacklist.service'; // adjust the import according to your structure
 
 // app business logic
 @Injectable()
@@ -20,6 +21,7 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
+    private tokenBlacklistService: TokenBlacklistService, // Inject the blacklist service
   ) {}
 
   async signup(userSignUpDto: UserSignUpDto): Promise<UserEntity> {
@@ -53,7 +55,12 @@ export class UsersService {
     delete userExists.password;
     return userExists;
   }
+  async logout(token: string): Promise<{ message: string }> {
+    // Add the token to the blacklist
+    this.tokenBlacklistService.addToken(token);
 
+    return { message: 'Logout successful.' };
+  }
   async findUserByEmail(email: string) {
     return await this.usersRepository.findOneBy({ email });
   }
